@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import telran.java2022.person.dao.PersonRepository;
@@ -60,26 +61,27 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Iterable<PersonDto> findPersonsByCity(String city) {
-	List<Person> persons = new ArrayList<>();
-	persons = (List<Person>) personRepository.findByAddressCity(city);
-	return persons.stream().map(p -> modelMapper.map(p, PersonDto.class)).collect(Collectors.toList());
+	return personRepository.findByAddressCity(city).map(p -> modelMapper.map(p, PersonDto.class))
+		.collect(Collectors.toList());
 
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Iterable<PersonDto> findPersonsByName(String name) {
-	List<Person> persons = new ArrayList<>();
-	persons = (List<Person>) personRepository.findByName(name);
-	return persons.stream().map(p -> modelMapper.map(p, PersonDto.class)).collect(Collectors.toList());
+	return personRepository.findByName(name).map(p -> modelMapper.map(p, PersonDto.class))
+		.collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Iterable<PersonDto> findPersonsBetweenAge(Integer minAge, Integer maxAge) {
-	List<Person> persons = new ArrayList<>();
-	persons = (List<Person>) personRepository.findByBirthDateGreaterThanOrBirthDateLessThan(
-		LocalDate.now().minusYears(maxAge), LocalDate.now().minusYears(minAge));
-	return persons.stream().map(p -> modelMapper.map(p, PersonDto.class)).collect(Collectors.toList());
+	return personRepository
+		.findByBirthDateGreaterThanOrBirthDateLessThan(LocalDate.now().minusYears(maxAge),
+			LocalDate.now().minusYears(minAge))
+		.map(p -> modelMapper.map(p, PersonDto.class)).collect(Collectors.toList());
     }
 
     @Override
