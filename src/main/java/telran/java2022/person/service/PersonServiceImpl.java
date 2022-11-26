@@ -26,7 +26,12 @@ public class PersonServiceImpl implements PersonService {
     final ModelMapper modelMapper;
 
     @Override
+    @Transactional
     public Boolean addPerson(PersonDto personDto) {
+	
+	if(personRepository.existsById(personDto.getId())) {
+	    return false;
+	}
 	personRepository.save(modelMapper.map(personDto, Person.class));
 	return true;
     }
@@ -38,13 +43,15 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @Transactional
     public PersonDto removePerson(Integer id) {
 	Person person = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException());
 	personRepository.deleteById(id);
 	return modelMapper.map(person, PersonDto.class);
     }
-
+    
     @Override
+    @Transactional
     public PersonDto updatePersonName(Integer id, String name) {
 	Person person = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException());
 	person.setName(name);
@@ -53,6 +60,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @Transactional
     public PersonDto updatePersonAddress(Integer id, AddressDto addressDto) {
 	Person person = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException());
 	person.setAddress(modelMapper.map(addressDto, Address.class));
@@ -86,12 +94,7 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public Iterable<CityPopulationDto> getCitiesPopulation() {
-	Iterable<String> uniqueCities = personRepository.findAllByAddressCity();
-	List<CityPopulationDto> cityCount = new ArrayList<>();
-	for (String city : uniqueCities) {
-	    cityCount.add(new CityPopulationDto(city, personRepository.countByAddressCity(city)));
-	}
-	return cityCount;
+	return personRepository.getCitiesPopulation();
     }
 
 }
