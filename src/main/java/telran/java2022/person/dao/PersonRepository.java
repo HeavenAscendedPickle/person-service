@@ -9,24 +9,28 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import telran.java2022.person.dto.CityPopulationDto;
+import telran.java2022.person.model.Child;
+import telran.java2022.person.model.Employee;
 import telran.java2022.person.model.Person;
 
 public interface PersonRepository extends CrudRepository<Person, Integer> {
 
-    @Query("select p from Person p where p.address.city=:city")
-    Stream<Person> findByAddressCity(@Param("city") String city);
-
-    @Query(value = "SELECT DISTINCT city FROM persons", nativeQuery = true)
-    Iterable<String> findAllByAddressCity();
-
     @Query("select p from Person p where p.name=?1")
     Stream<Person> findByName(String name);
 
-    Stream<Person> findByBirthDateGreaterThanOrBirthDateLessThan(LocalDate minDate, LocalDate maxDate);
+    @Query("select p from Person p where p.address.city=:city")
+    Stream<Person> findByAddressCity(@Param("city") String city);
+
+    Stream<Person> findByBirthDateBetween(LocalDate from, LocalDate to);
 
     @Query("select new telran.java2022.person.dto.CityPopulationDto(p.address.city, count(p)) from Person p group by p.address.city order by count(p) desc")
     List<CityPopulationDto> getCitiesPopulation();
 
-    long countByAddressCity(String city);
+    Stream<Employee> findBySalaryBetween(int min, int max);
+    
+    @Query("select c from Child c")
+    Stream<Child> findAllChildren();
+    
+    	
 
 }
