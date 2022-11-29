@@ -28,8 +28,8 @@ public interface PersonRepository extends CrudRepository<Person, Integer> {
 
     Stream<Employee> findBySalaryBetween(int min, int max);
     
-    @Query("select c from Child c")
-    Stream<Child> findAllChildren();
+    //@Query("select c from Child c")
+    Stream<Child> findChildrenBy();
     
     	
 
